@@ -9,7 +9,7 @@ int main()
 	while (true)
 	{
 		//‰÷»æ÷°
-
+		cout << 1 << endl;
 
 	}
 	
