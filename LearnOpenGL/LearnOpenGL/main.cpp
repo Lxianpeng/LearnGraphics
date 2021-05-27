@@ -9,7 +9,7 @@ int main()
 	while (true)
 	{
 		//‰÷»æ÷°
-		system("time");
+		
 		
 	}
 	
