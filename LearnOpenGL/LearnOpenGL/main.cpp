@@ -8,7 +8,9 @@ int main()
 {
 	while (true)
 	{
-		cout << 1 << endl;
+		//äÖÈ¾Ö¡
+
+
 	}
 	
 	return 0;
