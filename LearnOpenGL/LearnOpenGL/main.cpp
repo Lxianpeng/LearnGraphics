@@ -9,8 +9,8 @@ int main()
 	while (true)
 	{
 		//‰÷»æ÷°
-		cout << 1 << endl;
-
+		system("time");
+		
 	}
 	
 	return 0;
