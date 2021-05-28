@@ -84,7 +84,7 @@ int main()
 	//GLFW_OPENGL_ANY_PROFILE
 	//GLFW_OPENGL_COMPAT_PROFILE
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
+	
 	//创建窗口
 	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
 
@@ -145,35 +145,82 @@ int main()
 	glDeleteShader(fragmentShader);//删除
 
 	
-	//顶点坐标
+	
+
+
+	////////////////////////////////////使用VBO//////////////////////////////////////
+
+	////顶点坐标
+	//float vertices[] = {
+	//	-0.5f,-0.5f,0.0f,
+	//	 0.5f,-0.5f,0.0f,
+	//	 0.0f, 0.5f,0.0f
+	//};
+
+	////定义VAO  VBO
+	//unsigned int VAO,VBO;
+	//glGenVertexArrays(1, &VAO);//用ID生成VAO顶点缓存对象
+	//glGenBuffers(1, &VBO);//用ID生成VBO顶点缓存对象
+
+	//glBindVertexArray(VAO);//绑定VAO
+
+	//glBindBuffer(GL_ARRAY_BUFFER, VBO);//绑定VBO
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);	//将定义的顶点数据复制到缓存中
+	//																			//GL_STATIC_DRAW ：数据不会或几乎不会改变。
+	//																			//GL_DYNAMIC_DRAW ：数据会被改变很多。
+	//																			//GL_STREAM_DRAW ：数据每次绘制时都会改变。
+	//														
+	////设置顶点属性指针
+	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	//glEnableVertexAttribArray(0);
+
+	////
+	//glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//glBindVertexArray(0);
+	//////////////////////////////////////////////////////////////////////////
+
+
+	//////////////////////////////////使用EBO////////////////////////////////////////
+
+
 	float vertices[] = {
-		-0.5f,-0.5f,0.0f,
-		 0.5f,-0.5f,0.0f,
-		 0.0f, 0.5f,0.0f
+	0.5f, 0.5f, 0.0f,   // 右上角
+	0.5f, -0.5f, 0.0f,  // 右下角
+	-0.5f, -0.5f, 0.0f, // 左下角
+	-0.5f, 0.5f, 0.0f   // 左上角
 	};
 
-	//定义VAO  VBO
-	unsigned int VAO,VBO;
+	unsigned int indices[] = { // 注意索引从0开始! 
+		0, 1, 3, // 第一个三角形
+		1, 2, 3  // 第二个三角形
+	};
+
+	//定义VAO  EBO   VBO
+	unsigned int VAO,EBO,VBO;
 	glGenVertexArrays(1, &VAO);//用ID生成VAO顶点缓存对象
 	glGenBuffers(1, &VBO);//用ID生成VBO顶点缓存对象
+	glGenBuffers(1, &EBO);//用ID生成EBO顶点缓存对象
 
 	glBindVertexArray(VAO);//绑定VAO
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);//绑定VBO
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);	//将定义的顶点数据复制到缓存中
-																				//GL_STATIC_DRAW ：数据不会或几乎不会改变。
-																				//GL_DYNAMIC_DRAW ：数据会被改变很多。
-																				//GL_STREAM_DRAW ：数据每次绘制时都会改变。
-															
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);//绑定EBO
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);	//将定义的顶点数据复制到缓存中
+																				
 	//设置顶点属性指针
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-
 
 	//
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
+
+
+	//////////////////////////////////////////////////////////////////////////
 
 	//循环渲染帧
 	while (!glfwWindowShouldClose(window))
@@ -181,10 +228,18 @@ int main()
 		//渲染
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);//设定颜色
 		glClear(GL_COLOR_BUFFER_BIT);//用设定的颜色去填充
-
+		
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); 线框模式
+		
 		glUseProgram(shaderProgram);
 		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLES,0,3);
+
+		//使用VBO绘制
+		//glDrawArrays(GL_TRIANGLES,0,3);
+		
+		//使用EBO绘制
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
 
 
 		//交换颜色缓存，检查事件
@@ -199,7 +254,10 @@ int main()
 	glDeleteBuffers(1, &VBO);
 	glDeleteProgram(shaderProgram);
 
-	printf("Exit");
+	
 	glfwTerminate();
+	
+	
+	printf("Exit");
 	return 0;
 }
