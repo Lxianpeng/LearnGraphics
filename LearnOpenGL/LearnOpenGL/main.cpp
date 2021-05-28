@@ -14,7 +14,6 @@ const unsigned int SCR_HEIGHT = 600;
 void framebuffer_size_callback(GLFWwindow* winwod, int width, int height) 
 {
 	glViewport(0, 0, width, height);
-	printf("111");
 }
 
 void processInput(GLFWwindow* window) 
