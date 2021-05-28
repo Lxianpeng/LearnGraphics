@@ -1,7 +1,4 @@
-
-
-#include <glad/glad.h>//封装的OpenGLApi,还有个是glew(更老)，
-//#include <GL/glew.h>
+#include <glad/glad.h>//封装的OpenGLApi,还有个是glew(更老)，//#include <GL/glew.h>
 #include <GLFW/glfw3.h>//创建窗口,监听事件用的
 #include <iostream>
 
