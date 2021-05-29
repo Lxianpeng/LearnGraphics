@@ -1,6 +1,7 @@
 #include <glad/glad.h>//封装的OpenGLApi,还有个是glew(更老)，//#include <GL/glew.h>
 #include <GLFW/glfw3.h>//创建窗口,监听事件用的
 #include <iostream>
+#include "Debug.h"
 
 using namespace std;
 
@@ -13,11 +14,12 @@ void framebuffer_size_callback(GLFWwindow* winwod, int width, int height)
 	glViewport(0, 0, width, height);
 }
 
-void processInput(GLFWwindow* window) 
+void processInput(GLFWwindow *window) 
 {
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS
 		|| glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 	{
+		
 		glfwSetWindowShouldClose(window, true);//关闭opengl绘制窗口
 	}
 }
@@ -44,9 +46,10 @@ bool checkCompileShader(unsigned int shader, GLenum shadertype)
 		printf(shadertypename);
 		printf("::COMPILATION_FAILED\n");
 		printf(infoLog);
+		Debug::log("123123");
 		return false;
 	}
-	
+	Debug::log("123123");
 	printf("Succeed Compile ");
 	printf(shadertypename);
 	printf(" Shader\n");
@@ -71,7 +74,7 @@ bool checkLinkShader(unsigned int shaderProgram)
 }
 int main()
 {
-
+	
 	//初始化
 	glfwInit();
 	//声明OPengl版本号，主版本号MAJOR，次版本号MINOR
@@ -83,7 +86,7 @@ int main()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	
 	//创建窗口
-	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
+	GLFWwindow *window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
 
 	if (window == NULL)//失败
 	{
@@ -117,7 +120,7 @@ int main()
 	checkCompileShader(vertexShader, GL_VERTEX_SHADER);
 
 	//像素着色器（片元着色器）
-	const char *fragmentShaderSource = 
+	const char *fragmentShaderSource =
 		"#version 330 core\n"
 		"out vec4 FragColor;\n"
 		"void main()\n"
@@ -193,7 +196,7 @@ int main()
 	};
 
 	//定义VAO  EBO   VBO
-	unsigned int VAO,EBO,VBO;
+	unsigned int VAO,EBO,VBO;//EBO是索引缓存对象
 	glGenVertexArrays(1, &VAO);//用ID生成VAO顶点缓存对象
 	glGenBuffers(1, &VBO);//用ID生成VBO顶点缓存对象
 	glGenBuffers(1, &EBO);//用ID生成EBO顶点缓存对象
