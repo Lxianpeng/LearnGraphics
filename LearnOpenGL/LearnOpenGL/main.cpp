@@ -2,7 +2,7 @@
 #include <GLFW/glfw3.h>//创建窗口,监听事件用的
 #include <iostream>
 #include "Debug.h"
-
+#include "shader.h"
 using namespace std;
 
 //定义宽高
@@ -24,54 +24,6 @@ void processInput(GLFWwindow *window)
 	}
 }
 
-bool checkCompileShader(unsigned int shader, GLenum shadertype)
-{
-	const char* shadertypename = "";
-	if (shadertype == GL_VERTEX_SHADER)
-	{
-		shadertypename = "VERTEX";
-	}
-	else
-	{
-		shadertypename = "FRAGMENT";
-	}
-	
-	int success;
-	char infoLog[512];
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(shader, 512, NULL, infoLog);
-		printf("ERROR::SHADER::");
-		printf(shadertypename);
-		printf("::COMPILATION_FAILED\n");
-		printf(infoLog);
-		Debug::log("123123");
-		return false;
-	}
-	Debug::log("123123");
-	printf("Succeed Compile ");
-	printf(shadertypename);
-	printf(" Shader\n");
-	
-	return true;
-}
-
-bool checkLinkShader(unsigned int shaderProgram)
-{
-	int success;
-	char infoLog[512];
-	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-	if (!success) {
-		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-		printf("ERROR::SHADER::");
-		printf("LINK_SHADER_PROGRAM");
-		printf("::COMPILATION_FAILED\n");
-		return false;
-	}
-	printf("Succeed Link Shader");
-	return true;
-}
 int main()
 {
 	
@@ -104,77 +56,58 @@ int main()
 	//指定窗口大小改变的时候调用函数
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
+	Shader uniformShader("ShaderFile/vertex/vertex.v","ShaderFile/fragment/fragmentFromUniform.f");
+	Shader vertexShader("ShaderFile/vertex/vertex.v", "ShaderFile/fragment/fragmentFromVertex.f");
 
-	//顶点着色器
-	const char *vertextShaderSource = 
-		"#version 330 core\n"
-		"layout (location = 0) in vec3 aPos;\n"
-		"void main()\n"
-		"{\n"
-		"	gl_Position = vec4(aPos.x,aPos.y,aPos.z,1.0);\n"
-		"}\0";
-	unsigned int vertexShader;
-	vertexShader = glCreateShader(GL_VERTEX_SHADER);//创建
-	glShaderSource(vertexShader, 1, &vertextShaderSource, NULL);//加载
-	glCompileShader(vertexShader);//编译
-	checkCompileShader(vertexShader, GL_VERTEX_SHADER);
 
-	//像素着色器（片元着色器）
-	const char *fragmentShaderSource =
-		"#version 330 core\n"
-		"out vec4 FragColor;\n"
-		"void main()\n"
-		"{\n"
-		"	FragColor = vec4(1.0f,0.5f,0.2f,1.0f);\n"
-		"}";
-	unsigned int fragmentShader;
-	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource,NULL);
-	glCompileShader(fragmentShader);
-	checkCompileShader(fragmentShader, GL_FRAGMENT_SHADER);
-
-	//创建shader程序  是将多个shader连接的最终版本
-	unsigned int shaderProgram;
-	shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertexShader);//加入
-	glAttachShader(shaderProgram, fragmentShader);//加入
-	glLinkProgram(shaderProgram);//链接
-	checkLinkShader(shaderProgram);
-
-	glDeleteShader(vertexShader);//删除
-	glDeleteShader(fragmentShader);//删除
-
-	
-	
-
+	//顶点数组对象：Vertex Array Object，VAO
+	//顶点缓冲对象：Vertex Buffer Object，VBO
+	//索引缓冲对象：Element Buffer Object，EBO或Index Buffer Object，IBO
 
 	////////////////////////////////////使用VBO//////////////////////////////////////
 
-	////顶点坐标
-	//float vertices[] = {
-	//	-0.5f,-0.5f,0.0f,
-	//	 0.5f,-0.5f,0.0f,
-	//	 0.0f, 0.5f,0.0f
-	//};
+	//顶点坐标
+	float vertices[] = {
+		-1.0f,-0.5f,0.0f,
+		 0.0f,-0.5f,0.0f,
+		 -0.5f, 0.5f,0.0f
+	};
 
-	////定义VAO  VBO
-	//unsigned int VAO,VBO;
-	//glGenVertexArrays(1, &VAO);//用ID生成VAO顶点缓存对象
-	//glGenBuffers(1, &VBO);//用ID生成VBO顶点缓存对象
+	float vertices2[] = {
+		 0.0f,-0.5f,0.0f, 1.0f,0.0f,0.0f,//左下
+		 1.0f,-0.5f,0.0f, 0.0f,1.0f,0.0f,//右下
+		 0.5f, 0.5f,0.0f, 0.0f,0.0f,1.0f //顶部
+	};
 
-	//glBindVertexArray(VAO);//绑定VAO
+	//定义VAO  VBO
+	unsigned int VAOs[2],VBOs[2];
+	glGenVertexArrays(2, VAOs);//用ID生成VAO顶点数组对象
+	glGenBuffers(2, VBOs);//用ID生成VBO顶点缓存对象
 
-	//glBindBuffer(GL_ARRAY_BUFFER, VBO);//绑定VBO
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);	//将定义的顶点数据复制到缓存中
-	//																			//GL_STATIC_DRAW ：数据不会或几乎不会改变。
-	//																			//GL_DYNAMIC_DRAW ：数据会被改变很多。
-	//																			//GL_STREAM_DRAW ：数据每次绘制时都会改变。
-	//														
-	////设置顶点属性指针
-	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	//glEnableVertexAttribArray(0);
+	glBindVertexArray(VAOs[0]);//绑定VAO
+	glBindBuffer(GL_ARRAY_BUFFER, VBOs[0]);//绑定VBO
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);	//将定义的顶点数据复制到缓存中
+																				    //GL_STATIC_DRAW ：数据不会或几乎不会改变。
+																				    //GL_DYNAMIC_DRAW ：数据会被改变很多。
+																				    //GL_STREAM_DRAW ：数据每次绘制时都会改变。
+	//设置顶点属性指针
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
 
-	////
+
+	glBindVertexArray(VAOs[1]);//绑定VAO
+	glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]);//绑定VBO
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices2), vertices2, GL_STATIC_DRAW);	//将定义的顶点数据复制到缓存中
+																					//GL_STATIC_DRAW ：数据不会或几乎不会改变。
+																					//GL_DYNAMIC_DRAW ：数据会被改变很多。
+																					//GL_STREAM_DRAW ：数据每次绘制时都会改变。
+	//设置顶点属性指针
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3*sizeof(float)));
+	glEnableVertexAttribArray(1);
+	//
 	//glBindBuffer(GL_ARRAY_BUFFER, 0);
 	//glBindVertexArray(0);
 	//////////////////////////////////////////////////////////////////////////
@@ -183,40 +116,40 @@ int main()
 	//////////////////////////////////使用EBO////////////////////////////////////////
 
 
-	float vertices[] = {
-	0.5f, 0.5f, 0.0f,   // 右上角
-	0.5f, -0.5f, 0.0f,  // 右下角
-	-0.5f, -0.5f, 0.0f, // 左下角
-	-0.5f, 0.5f, 0.0f   // 左上角
-	};
+	//float vertices[] = {
+	//0.5f, 0.5f, 0.0f,   // 右上角
+	//0.5f, -0.5f, 0.0f,  // 右下角
+	//-0.5f, -0.5f, 0.0f, // 左下角
+	//-0.5f, 0.5f, 0.0f   // 左上角
+	//};
 
-	unsigned int indices[] = { // 注意索引从0开始! 
-		0, 1, 3, // 第一个三角形
-		1, 2, 3  // 第二个三角形
-	};
+	//unsigned int indices[] = { // 注意索引从0开始! 
+	//	0, 1, 3, // 第一个三角形
+	//	1, 2, 3  // 第二个三角形
+	//};
 
 	//定义VAO  EBO   VBO
-	unsigned int VAO,EBO,VBO;//EBO是索引缓存对象
-	glGenVertexArrays(1, &VAO);//用ID生成VAO顶点缓存对象
-	glGenBuffers(1, &VBO);//用ID生成VBO顶点缓存对象
-	glGenBuffers(1, &EBO);//用ID生成EBO顶点缓存对象
+	//unsigned int VAO,EBO,VBO;//EBO是索引缓存对象
+	//glGenVertexArrays(1, &VAO);//用ID生成VAO顶点缓存对象
+	//glGenBuffers(1, &VBO);//用ID生成VBO顶点缓存对象
+	//glGenBuffers(1, &EBO);//用ID生成EBO顶点缓存对象
 
-	glBindVertexArray(VAO);//绑定VAO
+	//glBindVertexArray(VAO);//绑定VAO
 
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);//绑定VBO
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	//glBindBuffer(GL_ARRAY_BUFFER, VBO);//绑定VBO
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);//绑定EBO
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);	//将定义的顶点数据复制到缓存中
-																				
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);//绑定EBO
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);	//将定义的顶点数据复制到缓存中
+	//																			
 	//设置顶点属性指针
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
+	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	//glEnableVertexAttribArray(0);
 
 	//
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
+	//glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//glBindVertexArray(0);
 
 
 
@@ -229,17 +162,27 @@ int main()
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);//设定颜色
 		glClear(GL_COLOR_BUFFER_BIT);//用设定的颜色去填充
 		
-		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); 线框模式
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //线框模式  默认是直接填充  GL_FILL
 		
-		glUseProgram(shaderProgram);
-		glBindVertexArray(VAO);
+		float timeValue = glfwGetTime();
+		float greenValue = sin(timeValue);//glUniform4f(inputColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+		uniformShader.use();
+		GLfloat colors[4] = { 0.0f, greenValue, 0.0f, 1.0f };
+		GLsizei size = 1;
+		uniformShader.setFloa4("inputColor", colors);
 
+
+		glBindVertexArray(VAOs[0]);
 		//使用VBO绘制
-		//glDrawArrays(GL_TRIANGLES,0,3);
+		glDrawArrays(GL_TRIANGLES,0,3);
 		
-		//使用EBO绘制
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		vertexShader.use();
+		glBindVertexArray(VAOs[1]);
+		//使用VBO绘制
+		glDrawArrays(GL_TRIANGLES, 0, 3); 
 
+		//使用EBO绘制
+		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 
 		//交换颜色缓存，检查事件
@@ -250,11 +193,14 @@ int main()
 		processInput(window);
 	}
 
-	glDeleteVertexArrays(1, &VAO);
-	glDeleteBuffers(1, &VBO);
-	glDeleteBuffers(1, &EBO);
-	glDeleteProgram(shaderProgram);
+	glDeleteVertexArrays(2, VAOs);
+	glDeleteBuffers(2, VBOs);
 
+	/////////////////////////////////EBO/////////////////////////////////////////
+	//glDeleteBuffers(1, &EBO);
+
+	uniformShader.destroy();
+	vertexShader.destroy();
 	
 	glfwTerminate();
 	

@@ -38,10 +38,20 @@
     <ClInclude Include="Debug.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="shader.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="LearnOpenGL.rc">
       <Filter>资源文件</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ShaderFile\vertex\vertex.v" />
+    <None Include="ShaderFile\fragment\fragmentFromVertex.f" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ShaderFile\fragment\fragmentFromUniform.f" />
   </ItemGroup>
 </Project>

@@ -146,9 +146,17 @@
   <ItemGroup>
     <ClInclude Include="Debug.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="shader.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="LearnOpenGL.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ShaderFile\fragment\fragmentFromVertex.f" />
+    <None Include="ShaderFile\vertex\vertex.v" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ShaderFile\fragment\fragmentFromUniform.f" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
