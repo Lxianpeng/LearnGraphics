@@ -165,17 +165,15 @@ int main()
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //线框模式  默认是直接填充  GL_FILL
 		
 		float timeValue = glfwGetTime();
-		float greenValue = sin(timeValue);//glUniform4f(inputColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+		float greenValue = sin(timeValue);//glUniform4f(0.0f, greenValue, 0.0f, 1.0f);
 		uniformShader.use();
 		GLfloat colors[4] = { 0.0f, greenValue, 0.0f, 1.0f };
-		GLsizei size = 1;
 		uniformShader.setFloa4("inputColor", colors);
-
-
 		glBindVertexArray(VAOs[0]);
 		//使用VBO绘制
 		glDrawArrays(GL_TRIANGLES,0,3);
 		
+
 		vertexShader.use();
 		glBindVertexArray(VAOs[1]);
 		//使用VBO绘制
